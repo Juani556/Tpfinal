@@ -1,22 +1,27 @@
-import UsuarioModel from "../model/usuarioModel.js"
+import UsuarioDAO from "../model/usuarioDAO.js"
+import cuentaService from "./cuentaService.js"
 import bcrypt from 'bcryptjs'
 import jsonwebtoken from 'jsonwebtoken'
 
 class LoginService {
 
     constructor() {
-        this.model = new UsuarioModel()
+        this.usuarioDAO = new UsuarioDAO()
+        this.cuentaService = cuentaService
     }
 
     registrarUsuario = async (usuario) => {
         usuario.password = await this.encriptarPassword(usuario.password)
-        return await this.model.guardarUsuario(usuario)
+        const response = await this.usuarioDAO.guardarUsuario(usuario)
+        this.cuentaService.crearCuenta(response)
+        return response
+        
     }
 
     login = async (loginRequest) => {
-        const usuario = await this.model.obtenerUsuario(loginRequest.username)
+        const usuario = await this.usuarioDAO.obtenerUsuario(loginRequest.username)
         if (await this.verificarPassword(loginRequest.password, usuario.password)) {
-            return this.generateToken(loginRequest.username)
+            return this.generateToken(usuario._id)
         } else {
             return ""
         }
@@ -31,14 +36,18 @@ class LoginService {
         return await bcrypt.compare(password, hash)
     }
 
-    generateToken(username) {
+    generateToken(id) {
         return jsonwebtoken.sign({
             data: {
-                username: username
+                user: id
             }
         }, "key", {
             expiresIn: 120
         })
+    }
+
+    randomNumber(length) {
+        return Math.floor(Math.pow(10, length-1) + Math.random() * (Math.pow(10, length) - Math.pow(10, length-1) - 1));
     }
 }
 

@@ -7,10 +7,10 @@ import jsonwebtoken from 'jsonwebtoken'
             const header = req.headers.authorization
             try {
                 const token = jsonwebtoken.verify(header.substring(7), 'key')
-                req.body.user = token.data.username
+                req.body.user = token.data.user
                 next()
             } catch (error) {
-                res.status(403).end()
+                res.status(403).json({mensaje: "Token invalido"})
             }
             
         } else {
