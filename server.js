@@ -1,18 +1,47 @@
-import express from 'express'
-import LoginRouter from './router/loginRouter.js'
-import Router from './router/router.js'
-import mongoose from 'mongoose'
+import express from 'express';
+import LoginRouter from './router/loginRouter.js';
+import Router from './router/router.js';
+import mongoose from 'mongoose';
 
-const app = express()
-mongoose.connect("mongodb://127.0.0.1:27017/banco").then(() => console.log("Conectado a la base")).catch(err => console.log(err))
+class Server {
 
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+    constructor(port, persistencia) {
+        this.port = port
+        this.persistencia = persistencia
+
+        this.app = express()
+        this.server = null
+    }
+
+    async start() {
+        this.app.use(express.json())
+        this.app.use(express.urlencoded({extended: true}))
+
+        this.app.use("", new LoginRouter().start())
+        this.app.use("", new Router().start())
+
+        if(this.persistencia == 'MONGODB') {
+            await mongoose.connect('mongodb://127.0.0.1:27017/banco');
+            console.log('Conectado a la base');
+        }
+
+        const PORT = this.port
+        this.server = this.app.listen(PORT, () => console.log(`Servidor express escuchando en http://localhost:${PORT}`))
+        this.server.on('error', error => console.log(`Error en servidor: ${error.message}`))
+
+        return this.app
+    }
+
+    async stop() {
+        if(this.server) {
+            this.server.close()
+            await mongoose.disconnect()
+            this.server = null
+        }
+    }
+}
 
 
-app.use("", new LoginRouter().start())
-app.use("", new Router().start())
+export default Server
 
 
-
-app.listen("8080", () => console.log("Escuchando en puerto 8080"))
