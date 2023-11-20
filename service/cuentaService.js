@@ -1,5 +1,7 @@
 import cuentaDAO from "../model/cuentaDAO.js"
 import {generate} from "random-words"
+const endpoint = 'https://dolarapi.com/v1/dolares'
+
 
 class CuentaService {
 
