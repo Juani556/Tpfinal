@@ -13,6 +13,7 @@ class Router {
 
         this.router.use(authenticationFilter)
         this.router.post('/ingresar', this.controller.ingresarPesos)
+        this.router.post('/comprarDolares', this.controller.comprarDolares)
         this.router.post('/transferir', this.controller.transferir)
 
         return this.router

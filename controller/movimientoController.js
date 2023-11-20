@@ -14,6 +14,10 @@ class MovimientoController {
         await this.service.ingresarPesos(req.body)
         res.end()
     }
+
+    comprarDolares = async (req, res) => {
+        res.json(await this.service.comprarDolares(req.body))
+    }
 }
 
 export default MovimientoController
