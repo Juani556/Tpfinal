@@ -1,5 +1,7 @@
 import cuentaDAO from "../model/cuentaDAO.js"
 import {generate} from "random-words"
+const endpoint = 'https://dolarapi.com/v1/dolares'
+
 
 class CuentaService {
 
@@ -68,7 +70,39 @@ class CuentaService {
             descripcion: request.descripcion || "Ingreso de dinero"
         })
         cuenta.save()
-    }    
+    }   
+    
+    comprarDolares = async (request) => {
+        const { compra: precioDolar } = await this.obtenerPrecioDolar()
+        const cuenta = await this.cuentaDao.obtenerCuentaPorUsuario(request.user)
+
+        if (cuenta.saldoPesos >= request.monto) {
+            const dolaresMonto = this.convertirPesosADolares(request.monto, precioDolar)
+
+            // Actualizar saldos
+            cuenta.saldoDolares += dolaresMonto;
+            cuenta.saldoPesos -= request.monto;
+
+            cuenta.movimientos.push({
+                monto: dolaresMonto,
+                moneda: "USD",
+                descripcion: request.descripcion || "Compra de dolares"
+            })
+            await cuenta.save()
+        } else {
+            return "Saldo insuficiente"
+        }
+    };
+    
+    obtenerPrecioDolar = async () => {
+        const response = await fetch(endpoint);
+        const result = await response.json();
+        return result[0];
+    };
+    
+    convertirPesosADolares = (montoPesos, precioDolar) => {
+        return montoPesos / precioDolar;
+    };
 
     generarCbu() {
         return Math.floor(Math.random() * Math.pow(10, 11)).toString() + Math.floor(Math.random() * Math.pow(10, 11)).toString()
