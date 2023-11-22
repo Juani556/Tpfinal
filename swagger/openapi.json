@@ -209,8 +209,54 @@
                     "JWT":[]
                 }]
             }
+        },
+         "/comprarDolares": {
+            "post": {
+                "tags": [
+                    "Cuenta"
+                ],
+                "description": "Comprar dólares con el dinero de la cuenta",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "monto": {
+                                        "type": "number",
+                                        "example": 100
+                                    },
+                                    "descripcion": {
+                                        "type": "string",
+                                        "example": "motivo"
+                                    }
+                                },
+                                "required": [
+                                    "monto",
+                                    "descripcion"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "(OK) el monto fue convertido a dolares || \"Saldo Insuficiente\""
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Error en el Servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
+            }
         }
-        
     }
-
-  }
+} 
