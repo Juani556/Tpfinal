@@ -18,7 +18,7 @@ class Server {
     async start() {
         this.app.use(express.json())
         this.app.use(express.urlencoded({extended: true}))
-        app.use("/docs", swagger.serve, swagger.setup(swaggerFile))
+        this.app.use("/docs", swagger.serve, swagger.setup(swaggerFile))
 
         this.app.use("", new LoginRouter().start())
         this.app.use("", new Router().start())
