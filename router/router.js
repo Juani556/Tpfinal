@@ -15,6 +15,7 @@ class Router {
         this.router.post('/ingresar', this.controller.ingresarPesos)
         this.router.post('/comprarDolares', this.controller.comprarDolares)
         this.router.post('/transferir', this.controller.transferir)
+        this.router.get('/cuenta', this.controller.obtenerCuenta)
 
         return this.router
     }
