@@ -1,4 +1,5 @@
 import LoginService from "../service/loginService.js"
+import { validacionRegistroLogin } from '../validacion/validaciones.js'
 
 class LoginController {
 
@@ -7,13 +8,33 @@ class LoginController {
     }
 
     registrarUsuario = async (req, res) => {
-        res.json( await this.service.registrarUsuario(req.body))
+        try {
+            const response = await this.service.registrarUsuario(await validacionRegistroLogin.validateAsync(req.body))
+            if (response.error) {
+                res.status(400).json(response)
+            } else {
+                res.json(response)
+            }
+        } catch (err) {
+            res.status(400).json({error: err.details[0].message})
+        }
+        
     }
     
     login = async (req, res) => {
-        res.json( {
-            token: await this.service.login(req.body)
-        })
+
+        try {
+            const response = await this.service.login(await validacionRegistroLogin.validateAsync(req.body))
+            if (response.error) {
+                res.status(400).json(response)
+            } else {
+                res.json(response)
+            }
+            
+        } catch (err) {
+            res.status(400).json({error: err.details[0].message})
+        }
+        
     }
 
     

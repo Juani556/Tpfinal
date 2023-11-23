@@ -11,6 +11,12 @@ class LoginService {
     }
 
     registrarUsuario = async (usuario) => {
+        const usuarioExistente = await this.usuarioDAO.obtenerUsuario(usuario.username)
+
+        if (usuarioExistente) {
+            return {error: "Ya existe usuario con ese nombre"}
+        }
+
         usuario.password = await this.encriptarPassword(usuario.password)
         const response = await this.usuarioDAO.guardarUsuario(usuario)
         this.cuentaService.crearCuenta(response)
@@ -20,10 +26,15 @@ class LoginService {
 
     login = async (loginRequest) => {
         const usuario = await this.usuarioDAO.obtenerUsuario(loginRequest.username)
+
+        if (!usuario) {
+            return {error: "Usuario no existente"}
+        }
+
         if (await this.verificarPassword(loginRequest.password, usuario.password)) {
-            return this.generateToken(usuario._id)
+            return {token: this.generateToken(usuario._id)}
         } else {
-            return ""
+            return {error: "Credenciales inválidas"}
         }
         
     }

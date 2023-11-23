@@ -39,15 +39,21 @@ class CuentaService {
             return {error: "Cuenta destino no existente"}
         }
 
+        if (cuentaDestino.equals(cuentaOrigen)) {
+            return {error: "No se puede transferir a esa cuenta"}
+        }
+
         cuentaOrigen.saldoPesos -= request.monto
         cuentaDestino.saldoPesos += request.monto
         
-        cuentaOrigen.movimientos.push({
+        const movimientoSaliente = {
             monto: request.monto * -1,
             moneda: "$",
             destinatario: cuentaDestino.cbu,
             descripcion: `Transferencia saliente a ${cuentaDestino.cbu}`
-        })
+        }
+
+        cuentaOrigen.movimientos.push(movimientoSaliente)
 
         cuentaDestino.movimientos.push({
             monto: request.monto,
@@ -58,18 +64,21 @@ class CuentaService {
         cuentaOrigen.save()
         cuentaDestino.save()
 
-
+        return movimientoSaliente
     }
 
     ingresarPesos = async (request) => {
         const cuenta = await this.cuentaDao.obtenerCuentaPorUsuario(request.user)
         cuenta.saldoPesos += request.monto
-        cuenta.movimientos.push({
+        const movimiento = {
             monto: request.monto,
             moneda: "$",
             descripcion: request.descripcion || "Ingreso de dinero"
-        })
+        }
+        cuenta.movimientos.push(movimiento)
         cuenta.save()
+
+        return movimiento
     }   
     
     comprarDolares = async (request) => {
