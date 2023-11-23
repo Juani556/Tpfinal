@@ -60,7 +60,7 @@ describe('Ingreso de dinero', () => {
   
       const usuarioResponse = await loginService.registrarUsuario(usuario);
 
-      const  token  = await loginService.login(usuarioCopy);
+      const  { token }  = await loginService.login(usuarioCopy);
 
       const response = await request.post('/ingresar').set("Authorization", `Bearer ${token}`).send({
         monto: faker.finance.amount()
