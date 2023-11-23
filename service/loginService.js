@@ -2,6 +2,8 @@ import UsuarioDAO from "../model/usuarioDAO.js"
 import cuentaService from "./cuentaService.js"
 import bcrypt from 'bcryptjs'
 import jsonwebtoken from 'jsonwebtoken'
+import config from '../config.js';
+import transporter from '../helpers/mailer.js'
 
 class LoginService {
 
@@ -14,8 +16,17 @@ class LoginService {
         usuario.password = await this.encriptarPassword(usuario.password)
         const response = await this.usuarioDAO.guardarUsuario(usuario)
         this.cuentaService.crearCuenta(response)
+        this.enviarEmail(usuario)
         return response
-        
+    }
+
+    enviarEmail = async (usuario) => {
+        await transporter.sendMail({
+            from: config.EMAIL,
+            to: usuario.email,
+            subject: '¡Bienvenido a tu nuevo Banco!',
+            text: `¡Hola ${usuario.username}! \n \n Te damos la bienvenida a nuestro banco. Estamos emocionados de tenerte con nosotros. Explora nuestras funciones y descubre cómo funciona nuestra aplicacion. \n ¡Gracias por unirte a nosotros! `
+        })
     }
 
     login = async (loginRequest) => {
