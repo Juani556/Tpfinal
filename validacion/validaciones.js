@@ -6,6 +6,12 @@ const jwt = Joi.object({
 
 export const validacionRegistroLogin = Joi.object({
     username: Joi.string().required(),
+    password: Joi.string().required(),
+    email: Joi.string().email()
+})
+
+export const validacionLogin = Joi.object({
+    username: Joi.string().required(),
     password: Joi.string().required()
 })
 

@@ -102,6 +102,10 @@ class CuentaService {
             return "Saldo insuficiente"
         }
     };
+
+    obtenerCuenta = async (request) => {
+        return await this.cuentaDao.obtenerCuentaPorUsuario(request.user)
+    }
     
     obtenerPrecioDolar = async () => {
         const response = await fetch(endpoint);
